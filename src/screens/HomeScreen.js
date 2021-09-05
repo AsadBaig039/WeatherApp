@@ -5,11 +5,9 @@ import {
   SafeAreaView,
   StyleSheet,
   ActivityIndicator,
-  FlatList,
   ImageBackground,
   TouchableOpacity,
 } from 'react-native';
-import {Cities} from '../res/constants/cities';
 import PakCities from '../res/constants/pk.json';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {WEATHER_API_KEY} from '../utils/weatherKey';
@@ -28,7 +26,6 @@ const HomeScreen = ({navigation}) => {
   const newArrayOfObj = items.map(({city: label}) => ({
     label,
     value: label,
-    // ...rest,
   }));
 
   const selectItem = value => {
@@ -37,14 +34,9 @@ const HomeScreen = ({navigation}) => {
     console.log('Selected Value', selectedValue);
   };
 
-  // console.log('New Array Object', newArrayOfObj);
-
-  console.log(value);
   // weather api call states
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-
-  // console.log('Data', data);
 
   useEffect(() => {
     setLoading(true);
@@ -88,18 +80,15 @@ const HomeScreen = ({navigation}) => {
         {selectedItem && selectedItem.city === undefined ? null : (
           <WeatherCard city={selectedItem} foreCast={data} />
         )}
-        {/* <View style={styles.weekList}>
-            <FlatList
-              showsHorizontalScrollIndicator={false}
-              data={data}
-              renderItem={item => <Text>{item.clouds}</Text>}
-            />
-          </View> */}
-        <TouchableOpacity
-          onPress={() => navigation.navigate('MapScreen', {data: selectedItem})}
-          style={styles.mapButton}>
-          <Text style={styles.mapViewText}>Map View</Text>
-        </TouchableOpacity>
+        {selectedItem && (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('MapScreen', {data: selectedItem})
+            }
+            style={styles.mapButton}>
+            <Text style={styles.mapViewText}>Map View</Text>
+          </TouchableOpacity>
+        )}
       </ImageBackground>
     </SafeAreaView>
   );
@@ -118,8 +107,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   selectCityText: {
-    fontSize: 26,
+    fontSize: 28,
     paddingVertical: 10,
+    color: 'white',
   },
   activityIndicator: {
     marginVertical: 10,

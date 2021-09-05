@@ -13,44 +13,64 @@ const WeatherCard = ({foreCast, city}) => {
   const weeklyTemp =
     foreCast && foreCast.daily ? foreCast.daily.map(({temp}) => temp.day) : [];
   console.log(weeklyTemp);
-  //   const [weather, setWeather] = useState();
-  //   const [icon, setIcon] = useState();
-  //   console.log(weather);
 
-  //   useEffect(() => {
-  //     const getWeather = foreCast.weather;
-  //     setWeather(...getWeather);
-  //     setIcon(weather.icon);
-  //   }, [foreCast]);
+  const fahrenheitToCelsius = fahrenheit => ((fahrenheit - 32) * 5) / 9;
+  const KelvinToCelsius = Kelvin => (Kelvin - 273.15).toFixed(2);
+
+  const getDate = dtVal => {
+    const date = new Date(dtVal * 1000 - foreCast.timezone_offset * 1000);
+    return date.toLocaleDateString('en-US');
+  };
 
   return foreCast && foreCast.current ? (
     <View>
       <View style={styles.container}>
-        <Text style={styles.cityText}>{city.city}</Text>
-        <Text>{JSON.stringify(foreCast.current.humidity)}</Text>
-      </View>
-      {foreCast && foreCast.daily ? (
+        <View style={{width: '50%'}}>
+          <Text style={styles.cityText}>{city.city}</Text>
+          <Text style={styles.detailsText}>
+            {KelvinToCelsius(JSON.stringify(foreCast.current.temp)) + ' C'}
+          </Text>
+          <Text>
+            {'Feels Like: ' +
+              KelvinToCelsius(JSON.stringify(foreCast.current.feels_like)) +
+              ' C'}
+          </Text>
+          <Text>{JSON.stringify(foreCast.current.weather[0].description)}</Text>
+        </View>
         <View
           style={{
-            height: 200,
-            backgroundColor: 'white',
-            marginVertical: 10,
+            width: '50%',
+            alignItems: 'center',
           }}>
+          <Image
+            resizeMode="cover"
+            style={{width: 120, height: 100}}
+            source={{
+              uri: `https://openweathermap.org/img/w/${foreCast.current.weather[0].icon}.png`,
+            }}
+          />
+        </View>
+      </View>
+      {foreCast && foreCast.daily ? (
+        <View style={styles.listContainer}>
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
             data={foreCast.daily}
             renderItem={
               ({item}) => (
-                <View>
-                  <Text>{item.weather[0].main}</Text>
+                <View style={styles.listCard}>
                   <Image
-                    style={{width: 100, height: 100}}
+                    style={{width: 50, height: 50}}
                     resizeMode="contain"
                     source={{
                       uri: `https://openweathermap.org/img/w/${item.weather[0].icon}.png`,
                     }}
                   />
+                  <Text>{getDate(item.dt)}</Text>
+                  <Text>{KelvinToCelsius(item.temp.day) + ' C'}</Text>
+                  <Text>{KelvinToCelsius(item.feels_like.day) + ' C'}</Text>
+                  <Text>{item.weather[0].description}</Text>
                 </View>
               )
               //   return (
@@ -68,15 +88,36 @@ const WeatherCard = ({foreCast, city}) => {
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: 'row',
     height: 100,
     backgroundColor: 'white',
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingTop: 5,
-    //  elevation: 3,
+    marginHorizontal: 20,
+    opacity: 0.7,
   },
   cityText: {
-    fontSize: 18,
+    fontSize: 26,
+    color: 'black',
+  },
+  detailsText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  listContainer: {
+    marginVertical: 50,
+    opacity: 0.7,
+  },
+  listCard: {
+    width: 100,
+    marginHorizontal: 10,
+    backgroundColor: 'white',
+    opacity: 0.9,
+    borderRadius: 10,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
 });
 
