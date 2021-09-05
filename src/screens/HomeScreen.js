@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   ImageBackground,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import PakCities from '../res/constants/pk.json';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -56,39 +57,45 @@ const HomeScreen = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground source={img} style={styles.image}>
-        <View style={styles.dropDownContainer}>
-          <Text style={styles.selectCityText}>Select City</Text>
-          <DropDownPicker
-            placeholder="Select City"
-            open={open}
-            value={value}
-            items={newArrayOfObj}
-            setOpen={setOpen}
-            setValue={setValue}
-            setItems={setItems}
-            onChangeValue={value => {
-              setValue(value);
-              selectItem(value);
-            }}
-          />
-        </View>
+        <ScrollView>
+          <View style={styles.dropDownContainer}>
+            <Text style={styles.selectCityText}>Select City</Text>
+            <DropDownPicker
+              placeholder="Select City"
+              open={open}
+              value={value}
+              items={newArrayOfObj}
+              setOpen={setOpen}
+              setValue={setValue}
+              setItems={setItems}
+              onChangeValue={value => {
+                setValue(value);
+                selectItem(value);
+              }}
+            />
+          </View>
 
-        <View style={styles.activityIndicator}>
-          <ActivityIndicator size="small" color="black" animating={isLoading} />
-        </View>
+          <View style={styles.activityIndicator}>
+            <ActivityIndicator
+              size="small"
+              color="black"
+              animating={isLoading}
+            />
+          </View>
 
-        {selectedItem && selectedItem.city === undefined ? null : (
-          <WeatherCard city={selectedItem} foreCast={data} />
-        )}
-        {selectedItem && (
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('MapScreen', {data: selectedItem})
-            }
-            style={styles.mapButton}>
-            <Text style={styles.mapViewText}>Map View</Text>
-          </TouchableOpacity>
-        )}
+          {selectedItem && selectedItem.city === undefined ? null : (
+            <WeatherCard city={selectedItem} foreCast={data} />
+          )}
+          {selectedItem && (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('MapScreen', {data: selectedItem})
+              }
+              style={styles.mapButton}>
+              <Text style={styles.mapViewText}>Map View</Text>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
       </ImageBackground>
     </SafeAreaView>
   );
