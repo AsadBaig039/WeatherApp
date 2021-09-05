@@ -7,6 +7,7 @@ import {
   FlatList,
   Image,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import {LineChart} from 'react-native-chart-kit';
 
@@ -25,104 +26,115 @@ const WeatherCard = ({foreCast, city}) => {
   };
 
   return foreCast && foreCast.current ? (
-    <View>
-      <View style={styles.container}>
-        <View style={{width: '50%'}}>
-          <Text style={styles.cityText}>{city.city}</Text>
-          <Text style={styles.detailsText}>
-            {KelvinToCelsius(JSON.stringify(foreCast.current.temp)) + ' C'}
-          </Text>
-          <Text>
-            {'Feels Like: ' +
-              KelvinToCelsius(JSON.stringify(foreCast.current.feels_like)) +
-              ' C'}
-          </Text>
-          <Text>{JSON.stringify(foreCast.current.weather[0].description)}</Text>
-        </View>
-        <View
-          style={{
-            width: '50%',
-            alignItems: 'center',
-          }}>
-          <Image
-            resizeMode="cover"
-            style={{width: 120, height: 100}}
-            source={{
-              uri: `https://openweathermap.org/img/w/${foreCast.current.weather[0].icon}.png`,
-            }}
-          />
-        </View>
-      </View>
-      {foreCast && foreCast.daily ? (
-        <View style={styles.listContainer}>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={foreCast.daily}
-            renderItem={({item}) => (
-              <View style={styles.listCard}>
-                <Image
-                  style={{width: 50, height: 50}}
-                  resizeMode="contain"
-                  source={{
-                    uri: `https://openweathermap.org/img/w/${item.weather[0].icon}.png`,
-                  }}
-                />
-                <Text>{getDate(item.dt)}</Text>
-                <Text>{KelvinToCelsius(item.temp.day) + ' C'}</Text>
-                <Text>{KelvinToCelsius(item.feels_like.day) + ' C'}</Text>
-                <Text>{item.weather[0].description}</Text>
-              </View>
-            )}
-          />
-        </View>
-      ) : null}
-      {foreCast && foreCast.daily ? (
-        <View>
-          <Text style={styles.tempGraphText}>Bezier Line Chart</Text>
-          <LineChart
-            data={{
-              labels: ['Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun', 'Mon'],
-              datasets: [
-                {
-                  data: weeklyTemp,
-                },
-              ],
-            }}
-            width={Dimensions.get('window').width} // from react-native
-            height={200}
-            withHorizontalLabels={false}
-            // yAxisLabel="Temperature"
-            //yAxisSuffix="k"
-            //yAxisInterval={1} // optional, defaults to 1
-            chartConfig={{
-              backgroundColor: 'white',
-              backgroundGradientFrom: 'grey',
-              backgroundGradientTo: 'white',
-              decimalPlaces: 2, // optional, defaults to 2dp
-              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-              propsForDots: {
-                r: '6',
-                strokeWidth: '2',
-                stroke: 'black',
-              },
-            }}
-            bezier
+    <ScrollView>
+      <View>
+        <View style={styles.container}>
+          <View style={{width: '50%'}}>
+            <Text style={styles.cityText}>{city.city}</Text>
+            <Text style={styles.detailsText}>
+              {KelvinToCelsius(JSON.stringify(foreCast.current.temp)) + ' C'}
+            </Text>
+            <Text>
+              {'Feels Like: ' +
+                KelvinToCelsius(JSON.stringify(foreCast.current.feels_like)) +
+                ' C'}
+            </Text>
+            <Text>
+              {JSON.stringify(foreCast.current.weather[0].description)}
+            </Text>
+          </View>
+          <View
             style={{
-              marginVertical: 8,
-              borderRadius: 16,
-            }}
-          />
+              width: '50%',
+              alignItems: 'center',
+            }}>
+            <Image
+              resizeMode="cover"
+              style={{width: 120, height: 100}}
+              source={{
+                uri: `https://openweathermap.org/img/w/${foreCast.current.weather[0].icon}.png`,
+              }}
+            />
+          </View>
         </View>
-      ) : null}
-    </View>
-  ) : (
-    <ActivityIndicator />
-  );
+        {foreCast && foreCast.daily ? (
+          <View style={styles.listContainer}>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={foreCast.daily}
+              renderItem={({item}) => (
+                <View style={styles.listCard}>
+                  <Image
+                    style={{width: 50, height: 50}}
+                    resizeMode="contain"
+                    source={{
+                      uri: `https://openweathermap.org/img/w/${item.weather[0].icon}.png`,
+                    }}
+                  />
+                  <Text>{getDate(item.dt)}</Text>
+                  <Text>{KelvinToCelsius(item.temp.day) + ' C'}</Text>
+                  <Text>{KelvinToCelsius(item.feels_like.day) + ' C'}</Text>
+                  <Text>{item.weather[0].description}</Text>
+                </View>
+              )}
+            />
+          </View>
+        ) : null}
+        {foreCast && foreCast.daily ? (
+          <View>
+            <Text style={styles.tempGraphText}>Bezier Line Chart</Text>
+            <LineChart
+              data={{
+                labels: [
+                  'Mon',
+                  'Tue',
+                  'Wed',
+                  'Thur',
+                  'Fri',
+                  'Sat',
+                  'Sun',
+                  'Mon',
+                ],
+                datasets: [
+                  {
+                    data: weeklyTemp,
+                  },
+                ],
+              }}
+              width={Dimensions.get('window').width} // from react-native
+              height={200}
+              withHorizontalLabels={false}
+              // yAxisLabel="Temperature"
+              //yAxisSuffix="k"
+              //yAxisInterval={1} // optional, defaults to 1
+              chartConfig={{
+                backgroundColor: 'white',
+                backgroundGradientFrom: 'grey',
+                backgroundGradientTo: 'white',
+                decimalPlaces: 2, // optional, defaults to 2dp
+                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                style: {
+                  borderRadius: 16,
+                },
+                propsForDots: {
+                  r: '6',
+                  strokeWidth: '2',
+                  stroke: 'black',
+                },
+              }}
+              bezier
+              style={{
+                marginVertical: 8,
+                borderRadius: 16,
+              }}
+            />
+          </View>
+        ) : null}
+      </View>
+    </ScrollView>
+  ) : null;
 };
 
 const styles = StyleSheet.create({

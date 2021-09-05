@@ -1,18 +1,55 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import MapView, {Marker, PROVIDER_GOOGLE, Callout} from 'react-native-maps'; // remove PROVIDER_GOOGLE import if not using Google Maps
 import GetLocation from 'react-native-get-location';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const MapScreen = ({navigation, route}) => {
   const coordinates = route.params.data;
+  console.log('coordinates', coordinates);
   const [newCoordinates, setNewCordinates] = useState(coordinates);
+  const [myLocation, setMylocation] = useState(null);
+  console.log('My Location', myLocation);
+
+  useEffect(() => {
+    GetLocation.getCurrentPosition({
+      enableHighAccuracy: true,
+      timeout: 15000,
+    })
+      .then(location => {
+        // console.log(location);
+        const {latitude, longitude} = location;
+        setMylocation({
+          lat: latitude,
+          lng: longitude,
+        });
+      })
+      .catch(error => {
+        const {code, message} = error;
+        console.warn(code, message);
+      });
+  }, []);
+
+  const changeLocation = () => {
+    setNewCordinates(myLocation);
+  };
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        // onPress={() => navigation.navigate('MapScreen', {data: value})}
-        style={styles.mapButton}>
-        <Text style={styles.mapViewText}>Show My Location</Text>
-      </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.headerView}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back-outline" size={26} color={'white'} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={changeLocation} style={styles.mapButton}>
+          <Text style={styles.mapViewText}>Show My Location</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.mapContainer}>
         {newCoordinates && (
           <MapView
@@ -35,7 +72,7 @@ const MapScreen = ({navigation, route}) => {
           </MapView>
         )}
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -43,12 +80,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    //justifyContent: 'center',
-    //alignItems: 'center',
+  },
+  headerView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    backgroundColor: 'black',
+    opacity: 0.4,
+    paddingVertical: 10,
   },
   mapContainer: {
     flex: 1,
-    // height: '70%',
     width: '100%',
     alignSelf: 'center',
   },
@@ -61,14 +104,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'flex-end',
-    marginHorizontal: 20,
-    borderWidth: 2,
-    borderColor: 'green',
+    borderWidth: 3,
+    borderColor: 'white',
     borderRadius: 10,
-    marginVertical: 20,
   },
   mapViewText: {
-    color: 'green',
+    color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
   },
